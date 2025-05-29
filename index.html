@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hacker Terminal</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      color: #00ff00;
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #00ff00;
+    }
+
+    p, .ip-info {
+      font-size: 1.2rem;
+      margin: 10px 0;
+      text-shadow: 0 0 5px #00ff00;
+    }
+
+    img.flag {
+      width: 50px;
+      height: auto;
+      margin-top: 10px;
+      border: 2px solid #00ff00;
+    }
+
+    button {
+      background-color: transparent;
+      border: 2px solid #00ff00;
+      color: #00ff00;
+      padding: 10px 20px;
+      margin-top: 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #00ff00;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="container">
+  <h1>WELCOME TO THE SYSTEM</h1>
+  <p>Accessing user metadata...</p>
+  <div class="ip-info" id="ip"></div>
+  <div class="ip-info" id="country"></div>
+  <img class="flag" id="flag" src="" alt="Country Flag" style="display: none;" />
+  <button onclick="alert('System breach logged.')">Proceed</button>
+</div>
+
+<script>
+  const canvas = document.getElementById("matrix");
+  const ctx = canvas.getContext("2d");
+
+  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+
+  let letters = "01";
+  letters = letters.split("");
+
+  let fontSize = 14;
+  let columns = canvas.width / fontSize;
+  let drops = Array(Math.floor(columns)).fill(1);
+
+  function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#0F0";
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = letters[Math.floor(Math.random() * letters.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  setInterval(drawMatrix, 33);
+
+  window.addEventListener("resize", () => {
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    columns = canvas.width / fontSize;
+    drops = Array(Math.floor(columns)).fill(1);
+  });
+
+  // Fetch IP & Location
+  fetch('https://ipwho.is/')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('ip').textContent = `Your IP: ${data.ip}`;
+      document.getElementById('country').textContent = `Location: ${data.city}, ${data.country}`;
+      const flag = document.getElementById('flag');
+      flag.src = data.flag.img;
+      flag.style.display = 'inline-block';
+    })
+    .catch(() => {
+      document.getElementById('ip').textContent = `Unable to retrieve IP info.`;
+    });
+</script>
+
+</body>
+</html>
